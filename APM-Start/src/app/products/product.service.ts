@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
@@ -8,32 +9,48 @@ import { of } from 'rxjs/observable/of';
 import { catchError, tap } from 'rxjs/operators';
 
 import { IProduct } from './product';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class ProductService {
-    private productsUrl = 'api/products';
+  private productsUrl = 'api/products';
+  private products: IProduct[];
 
-    constructor(private http: HttpClient) { }
+  private selectedProductSource = new BehaviorSubject<IProduct | null>(null);
+  selectedProductChanges$ = this.selectedProductSource.asObservable();
 
-    getProducts(): Observable<IProduct[]> {
-        return this.http.get<IProduct[]>(this.productsUrl)
-                        .pipe(
-                            tap(data => console.log(JSON.stringify(data))),
-                            catchError(this.handleError)
-                        );
+  constructor(private http: HttpClient) { }
+
+  changeSelectProduct(selectedProduct: IProduct | null) {
+    this.selectedProductSource.next(selectedProduct);
+  }
+
+  getProducts(): Observable<IProduct[]> {
+    return this.http.get<IProduct[]>(this.productsUrl)
+      .pipe(
+        // tap(data => console.log(JSON.stringify(data))),
+        tap(data => this.products = data),
+        catchError(this.handleError)
+      );
+  }
+
+  getProduct(id: number): Observable<IProduct> {
+    if (id === 0) {
+      return of(this.initializeProduct());
     }
-
-    getProduct(id: number): Observable<IProduct> {
-        if (id === 0) {
-            return of(this.initializeProduct());
-        }
-        const url = `${this.productsUrl}/${id}`;
-        return this.http.get<IProduct>(url)
-                        .pipe(
-                            tap(data => console.log('Data: ' + JSON.stringify(data))),
-                            catchError(this.handleError)
-                        );
+    if (this.products) {
+      const foundItem = this.products.find(product => product.id === id);
+      if (foundItem) {
+        return of(foundItem);
+      }
     }
+    const url = `${this.productsUrl}/${id}`;
+    return this.http.get<IProduct>(url)
+      .pipe(
+        tap(data => console.log('Data: ' + JSON.stringify(data))),
+        catchError(this.handleError)
+      );
+  }
 
     saveProduct(product: IProduct): Observable<IProduct> {
         const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -50,6 +67,13 @@ export class ProductService {
         return this.http.delete<IProduct>(url, { headers: headers} )
                         .pipe(
                             tap(data => console.log('deleteProduct: ' + id)),
+                            tap ( data => {
+                              const foundIndex = this.products.findIndex(item => item.id === id);
+                              if ( foundIndex > -1) {
+                                this.products.splice(foundIndex, 1);
+                                this.changeSelectProduct(null);
+                              }
+                            }),
                             catchError(this.handleError)
                         );
     }
@@ -58,7 +82,12 @@ export class ProductService {
         product.id = null;
         return this.http.post<IProduct>(this.productsUrl, product,  { headers: headers} )
                         .pipe(
-                            tap(data => console.log('createProduct: ' + JSON.stringify(data))),
+                            // tap(data => console.log('createProduct: ' + JSON.stringify(data))),
+                            tap(data => {
+                              this.products.push(product);
+                              this.changeSelectProduct(data);
+
+                            }),
                             catchError(this.handleError)
                         );
     }

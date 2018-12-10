@@ -2,7 +2,7 @@
         <div class='panel-heading'>
             Product Detail: {{product.productName}}
         </div>
-    
+
         <div class='panel-body'>
             <div class='row'>
                 <div class='col-md-6'>
@@ -34,18 +34,18 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <div class='col-md-6'>
                     <img *ngIf='product.imageUrl'
-                         class='center-block img-responsive' 
-                         [style.width.px]='200' 
-                         [style.margin.px]='2' 
+                         class='center-block img-responsive'
+                         [style.width.px]='200'
+                         [style.margin.px]='2'
                          [src]='product.imageUrl'
                          [title]='product.productName'>
                 </div>
             </div>
         </div>
-    
+
         <div class='panel-footer'>
             <a class="btn btn-primary" style="width:80px" [routerLink]="['/products', product.id, 'edit']">
                 Edit

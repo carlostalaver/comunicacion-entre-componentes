@@ -18,7 +18,7 @@ import { ProductShellListComponent } from './product-shell/product-shell-list.co
   imports: [
     SharedModule,
     RouterModule.forChild([
-      { path: '', component: ProductShellComponent },
+      { path: '', component: ProductListComponent },
       { path: ':id', component: ProductDetailComponent },
       {
         path: ':id/edit',

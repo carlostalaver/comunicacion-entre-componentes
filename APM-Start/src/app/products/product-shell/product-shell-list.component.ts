@@ -20,7 +20,7 @@ export class ProductShellListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.subscrip = this.productService.selectedProductChanges$
-    .subscribe( (data: IProduct) => this.selectedProduct = data);
+                                        .subscribe( (data: IProduct) => this.selectedProduct = data);
     this.productService.getProducts().subscribe(
       (products: IProduct[]) => {
         this.products = products;

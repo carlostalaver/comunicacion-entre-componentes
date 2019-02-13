@@ -16,7 +16,7 @@ export class ProductService {
   private productsUrl = 'api/products';
   private products: IProduct[];
 
-  private selectedProductSource = new BehaviorSubject<IProduct | null>(null);
+  private selectedProductSource = new BehaviorSubject<IProduct | null>(null); //  mi BehaviorSubject
   selectedProductChanges$ = this.selectedProductSource.asObservable();
 
   constructor(private http: HttpClient) { }
@@ -26,9 +26,12 @@ export class ProductService {
   }
 
   getProducts(): Observable<IProduct[]> {
+    if (this.products){
+      return of(this.products)
+    }
     return this.http.get<IProduct[]>(this.productsUrl)
       .pipe(
-        // tap(data => console.log(JSON.stringify(data))),
+        tap(data => console.log(JSON.stringify(data))),
         tap(data => this.products = data),
         catchError(this.handleError)
       );
@@ -79,14 +82,13 @@ export class ProductService {
     }
 
     private createProduct(product: IProduct, headers: HttpHeaders): Observable<IProduct> {
-        product.id = null;
+        product.id = null; // el API web en memoria REQUIERE que el id sea null para poder asignarle un id
         return this.http.post<IProduct>(this.productsUrl, product,  { headers: headers} )
                         .pipe(
                             // tap(data => console.log('createProduct: ' + JSON.stringify(data))),
                             tap(data => {
                               this.products.push(product);
                               this.changeSelectProduct(data);
-
                             }),
                             catchError(this.handleError)
                         );

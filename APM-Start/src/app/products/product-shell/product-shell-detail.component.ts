@@ -22,7 +22,7 @@ export class ProductShellDetailComponent implements OnInit, OnDestroy {
       this.subs.unsubscribe();
     }
 
-/*     get product(): IProduct | null {
+/*  get product(): IProduct | null {
       return this.productService.currentProduct;
     } */
 

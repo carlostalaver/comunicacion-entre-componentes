@@ -9,11 +9,15 @@ import { NgModel } from '@angular/forms';
   styleUrls: ['./criteria.component.css']
 })
 export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
+
   @ViewChild('filterElement') filterElementRef: ElementRef; /* esto es HTHL */
   @ViewChild(NgModel) modelRef: NgModel;
+
   @Input() displayDetail: boolean;
   @Input() hitCount: number;
+
   @Output() valueChange: EventEmitter<string> = new EventEmitter<string>();
+  hitMessage: string;
 
   private _listFilter: string;
   get listFilter(): string {
@@ -25,6 +29,17 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
       this.valueChange.emit(value);
     }, 50);
   }
+
+  private _hitCountTest: number;
+  get hitCountTest(): number {
+    return this._hitCountTest;
+  }
+  @Input()
+  set hitCountTest(value: number) {
+     this._hitCountTest = value;
+  }
+
+
   constructor() { }
 
   ngOnInit() {
@@ -38,6 +53,11 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // console.log('cambiando', changes);
+
+    if (changes['hitCount'] && !changes['hitCount'].currentValue) {
+      this.hitMessage = 'Sin coincidencias';
+    } else {
+      this.hitMessage = 'Coincidencias ' + this.hitCount;
+    }
   }
 }

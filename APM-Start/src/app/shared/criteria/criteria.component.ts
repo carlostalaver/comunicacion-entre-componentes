@@ -11,7 +11,7 @@ import { NgModel } from '@angular/forms';
 export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('filterElement') filterElementRef: ElementRef; /* esto es HTHL */
-  @ViewChild(NgModel) modelRef: NgModel;
+  @ViewChild(NgModel) modelRef: NgModel; /* retorna una referencia al NgModel */
 
   @Input() displayDetail: boolean;
   @Input() hitCount: number;
@@ -30,16 +30,6 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
     }, 50);
   }
 
-  private _hitCountTest: number;
-  get hitCountTest(): number {
-    return this._hitCountTest;
-  }
-  @Input()
-  set hitCountTest(value: number) {
-     this._hitCountTest = value;
-  }
-
-
   constructor() { }
 
   ngOnInit() {
@@ -47,13 +37,12 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
 
 
   ngAfterViewInit(): void {
-    if (this.filterElementRef) {
+    if (this.filterElementRef.nativeElement) {
       this.filterElementRef.nativeElement.focus();
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
     if (changes['hitCount'] && !changes['hitCount'].currentValue) {
       this.hitMessage = 'Sin coincidencias';
     } else {
